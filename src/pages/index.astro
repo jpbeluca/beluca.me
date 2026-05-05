@@ -1,0 +1,20 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Background from "../components/Background.astro";
+---
+
+<BaseLayout>
+  <span id="top"></span>
+  <Header />
+
+  <main>
+    <Background />
+
+    <div
+      style="padding: 72px var(--page-pad-x); font-family: var(--font-mono); font-size: 12px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);"
+    >
+      Next: § II. Recent writing
+    </div>
+  </main>
+</BaseLayout>

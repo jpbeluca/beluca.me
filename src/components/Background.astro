@@ -1,0 +1,83 @@
+---
+import SectionLabel from "./SectionLabel.astro";
+import { profile } from "../data/profile";
+---
+
+<section id="about" class="background">
+  <div class="background__avatar">
+    <img
+      src="/avatar.png"
+      alt="John Beluca"
+      width="220"
+      height="280"
+      loading="lazy"
+    />
+    <div class="background__caption">
+      John Beluca · Calgary, AB<br />April 2026
+    </div>
+  </div>
+
+  <div class="background__body">
+    <SectionLabel n="I" title="Background" />
+    <div class="background__copy">
+      {profile.about.map((p) => <p>{p}</p>)}
+    </div>
+  </div>
+</section>
+
+<style>
+  .background {
+    padding: 64px var(--page-pad-x);
+    border-top: 1px solid var(--rule);
+    background: var(--paper);
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 60px;
+  }
+
+  .background__avatar img {
+    width: 220px;
+    height: 280px;
+    object-fit: cover;
+    object-position: center top;
+    filter: grayscale(0.2) contrast(1.05);
+    border-radius: 10px;
+  }
+
+  .background__caption {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 14px;
+    line-height: 1.6;
+  }
+
+  .background__body {
+    min-width: 0;
+  }
+
+  .background__copy {
+    font-family: var(--font-sans);
+    color: var(--ink2);
+  }
+
+  .background__copy p {
+    margin: 0 0 22px;
+    font-size: 18px;
+    line-height: 1.55;
+    max-width: 720px;
+  }
+
+  .background__copy p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 820px) {
+    .background {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+  }
+</style>
