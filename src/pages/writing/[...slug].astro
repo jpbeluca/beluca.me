@@ -1,7 +1,6 @@
 ---
 import { getCollection, render, type CollectionEntry } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 
 export async function getStaticPaths() {
@@ -34,10 +33,11 @@ const ogImage = `/writing/${post.id}/og.png`;
   ogImage={ogImage}
   type="article"
 >
-  <span id="top"></span>
-  <Header />
-
   <main>
+    <div class="page__topnav">
+      <a href="/">← beluca.me</a>
+    </div>
+
     <article class="post">
       <a class="post__back" href="/writing/">← All writing</a>
 
@@ -61,10 +61,28 @@ const ogImage = `/writing/${post.id}/og.png`;
 </BaseLayout>
 
 <style>
+  .page__topnav {
+    padding: 24px var(--page-pad-x) 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .page__topnav a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .page__topnav a:hover {
+    color: var(--accent);
+  }
+
   .post {
     max-width: 760px;
-    margin: 0 auto;
-    /*padding: 64px var(--page-pad-x) 96px;*/
+    margin: 40px auto 0;
+    padding: 0 var(--page-pad-x) 96px;
   }
 
   .post__back {

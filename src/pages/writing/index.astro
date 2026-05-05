@@ -1,7 +1,6 @@
 ---
 import { getCollection } from "astro:content";
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import SectionLabel from "../../components/SectionLabel.astro";
 
@@ -19,10 +18,11 @@ const fmt = new Intl.DateTimeFormat("en-US", {
   title="Writing — John Beluca"
   description="Notes on AI systems, agentic architectures, AWS, and the slower work of leading engineering."
 >
-  <span id="top"></span>
-  <Header />
-
   <main>
+    <div class="page__topnav">
+      <a href="/">← beluca.me</a>
+    </div>
+
     <section class="archive">
       <div class="archive__head">
         <SectionLabel n="II" title="Writing" />
@@ -61,8 +61,26 @@ const fmt = new Intl.DateTimeFormat("en-US", {
 </BaseLayout>
 
 <style>
+  .page__topnav {
+    padding: 24px var(--page-pad-x) 0;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .page__topnav a {
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .page__topnav a:hover {
+    color: var(--accent);
+  }
+
   .archive {
-    padding: 64px var(--page-pad-x);
+    padding: 40px var(--page-pad-x) 64px;
   }
 
   .archive__head {

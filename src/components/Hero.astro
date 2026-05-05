@@ -1,12 +1,20 @@
 ---
 import MountainBg from "./MountainBg.astro";
 import Chat from "./Chat.tsx";
+import { profile } from "../data/profile";
 
 const stats = [
   { n: "12+", label: "Years architecting" },
   { n: "40+", label: "Clients delivered" },
   { n: "8+", label: "Years on AWS" },
   { n: "06", label: "Industries" },
+];
+
+const navItems = [
+  { label: "About", href: "#about" },
+  { label: "Work", href: "#work" },
+  { label: "Writing", href: "#writing" },
+  { label: "Contact", href: "#contact" },
 ];
 ---
 
@@ -34,7 +42,24 @@ const stats = [
 
       <div class="hero__cta-row">
         <a class="hero__cta" href="#work">See selected work →</a>
+        <a class="hero__cta hero__cta--outline" href={`mailto:${profile.email}`}>
+          Get In Touch ↗
+        </a>
       </div>
+
+      <nav class="hero__nav" aria-label="Primary">
+        {
+          navItems.map((item) => (
+            <a class="hero__nav-link" href={item.href}>
+              {item.label}
+            </a>
+          ))
+        }
+      </nav>
+    </div>
+
+    <aside class="hero__right" aria-label="Agent chat">
+      <Chat client:load />
 
       <div class="hero__stats">
         {
@@ -46,10 +71,6 @@ const stats = [
           ))
         }
       </div>
-    </div>
-
-    <aside class="hero__right" aria-label="Agent chat">
-      <Chat client:load />
     </aside>
   </div>
 </section>
@@ -77,6 +98,11 @@ const stats = [
     grid-template-columns: 1.2fr 1fr;
     gap: 64px;
     align-items: flex-start;
+  }
+
+  .hero__right {
+    display: flex;
+    flex-direction: column;
   }
 
   .status-pill {
@@ -111,7 +137,7 @@ const stats = [
     font-size: 60px;
   }
 
-  .hero__name {    
+  .hero__name {
     font-weight: 500;
     color: var(--accent);
   }
@@ -140,20 +166,59 @@ const stats = [
     font-size: 14px;
     font-family: var(--font-mono);
     letter-spacing: 0.5px;
-    transition: background 0.15s;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    border: 1px solid var(--ink);
   }
 
   .hero__cta:hover {
     background: var(--accent);
+    border-color: var(--accent);
   }
 
-  .hero__stats {
+  .hero__cta--outline {
+    background: transparent;
+    color: var(--ink);
+  }
+
+  .hero__cta--outline:hover {
+    background: var(--ink);
+    color: var(--bg);
+    border-color: var(--ink);
+  }
+
+  .hero__nav {
     margin-top: 56px;
     display: flex;
     gap: 48px;
+    flex-wrap: wrap;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
     font-family: var(--font-mono);
     font-size: 12px;
-    padding-top: 32px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .hero__nav-link {
+    color: var(--ink2);
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    padding-bottom: 2px;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  .hero__nav-link:hover {
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  .hero__stats {
+    margin-top: 32px;
+    display: flex;
+    gap: 32px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding-top: 24px;
     border-top: 1px solid var(--rule);
     flex-wrap: wrap;
   }
@@ -192,6 +257,9 @@ const stats = [
     .hero__title {
       font-size: 44px;
       letter-spacing: -1px;
+    }
+    .hero__nav {
+      gap: 18px;
     }
     .hero__stats {
       gap: 28px;
