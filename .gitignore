@@ -2,8 +2,6 @@
 dist/
 .output/
 
-design_handoff_beluca_me/
-
 # dependencies
 node_modules/
 
