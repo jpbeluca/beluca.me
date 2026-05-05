@@ -1,0 +1,121 @@
+---
+import SectionLabel from "./SectionLabel.astro";
+import { profile } from "../data/profile";
+---
+
+<section id="experience" class="experience">
+  <SectionLabel n="V" title="Experience" />
+  <div class="experience__grid">
+    {
+      profile.experience.map((job) => (
+        <>
+          <div class="experience__period">
+            {job.period}
+            <br />
+            <span class="experience__location">{job.location}</span>
+          </div>
+          <div class="experience__body">
+            <div class="experience__role">{job.role}</div>
+            <div class="experience__company">at {job.company}</div>
+            <p class="experience__blurb">{job.blurb}</p>
+            <ul class="experience__bullets">
+              {job.bullets.map((b) => (
+                <li>{b}</li>
+              ))}
+            </ul>
+          </div>
+        </>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .experience {
+    padding: 64px var(--page-pad-x);
+    background: var(--bg-alt);
+    border-top: 1px solid var(--rule);
+  }
+
+  .experience__grid {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    row-gap: 48px;
+    column-gap: 40px;
+  }
+
+  .experience__period {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    padding-top: 8px;
+    line-height: 1.6;
+  }
+
+  .experience__location {
+    color: var(--ink);
+  }
+
+  .experience__role {
+    font-family: var(--font-sans);
+    font-size: 28px;
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.4px;
+  }
+
+  .experience__company {
+    font-family: var(--font-sans);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+
+  .experience__blurb {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--muted);
+    font-style: italic;
+    margin: 10px 0 16px;
+    max-width: 700px;
+  }
+
+  .experience__bullets {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink2);
+  }
+
+  .experience__bullets li {
+    position: relative;
+    padding-left: 24px;
+    margin-bottom: 8px;
+    max-width: 760px;
+  }
+
+  .experience__bullets li::before {
+    content: "—";
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--accent);
+  }
+
+  @media (max-width: 820px) {
+    .experience__grid {
+      grid-template-columns: 1fr;
+      row-gap: 12px;
+    }
+    .experience__period {
+      padding-top: 0;
+    }
+    .experience__body {
+      margin-bottom: 32px;
+    }
+  }
+</style>

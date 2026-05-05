@@ -1,0 +1,143 @@
+---
+import SectionLabel from "./SectionLabel.astro";
+import { profile } from "../data/profile";
+---
+
+<section id="work" class="projects">
+  <SectionLabel n="III" title="Selected Work" />
+  <div class="projects__grid">
+    {
+      profile.projects.map((p, i) => (
+        <article class="project-card">
+          <div class="project-card__meta">
+            <span>Case {String(i + 1).padStart(2, "0")}</span>
+            <span>{p.year}</span>
+          </div>
+          <div class="project-card__industry">{p.industry}</div>
+          <h3 class="project-card__title">{p.title}</h3>
+          <p class="project-card__summary">{p.summary}</p>
+          <div class="project-card__stack">
+            {p.stack.map((s) => <span class="project-card__pill">{s}</span>)}
+          </div>
+          <div class="project-card__outcome">
+            <span class="project-card__outcome-label">Outcome → </span>
+            {p.impact}
+          </div>
+        </article>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .projects {
+    padding: 64px var(--page-pad-x);
+    border-top: 1px solid var(--rule);
+  }
+
+  .projects__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 28px;
+  }
+
+  .project-card {
+    border: 1px solid var(--rule);
+    padding: 28px;
+    background: var(--paper);
+    position: relative;
+    transition:
+      border-color 0.2s,
+      transform 0.2s;
+  }
+
+  .project-card:hover {
+    border-color: var(--ink);
+    transform: translateY(-2px);
+  }
+
+  .project-card__meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .project-card__industry {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    margin-bottom: 6px;
+  }
+
+  .project-card__title {
+    font-family: var(--font-sans);
+    font-size: 24px;
+    font-weight: 500;
+    line-height: 1.2;
+    margin: 0 0 16px;
+    min-height: 87px;
+    letter-spacing: -0.3px;
+  }
+
+  .project-card__summary {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink2);
+    margin: 0 0 20px;
+  }
+
+  .project-card__stack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 20px;
+  }
+
+  .project-card__pill {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 3px 8px;
+    border: 1px solid var(--rule);
+    color: var(--muted);
+  }
+
+  .project-card__outcome {
+    border-top: 1px solid var(--rule);
+    padding-top: 16px;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-style: italic;
+    color: var(--ink2);
+    line-height: 1.5;
+  }
+
+  .project-card__outcome-label {
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  @media (max-width: 1080px) {
+    .projects__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .project-card__title {
+      min-height: 0;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .projects__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

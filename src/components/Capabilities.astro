@@ -1,0 +1,74 @@
+---
+import SectionLabel from "./SectionLabel.astro";
+import { profile } from "../data/profile";
+
+const categories = Object.entries(profile.skills);
+---
+
+<section class="capabilities">
+  <SectionLabel n="IV" title="Capabilities" />
+  <div class="capabilities__grid">
+    {
+      categories.map(([cat, items]) => (
+        <div class="capability">
+          <div class="capability__title">{cat}</div>
+          <ul class="capability__list">
+            {items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .capabilities {
+    padding: 64px var(--page-pad-x);
+    background: var(--bg-alt);
+    border-top: 1px solid var(--rule);
+  }
+
+  .capabilities__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 40px;
+  }
+
+  .capability__title {
+    font-family: var(--font-sans);
+    font-style: italic;
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .capability__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .capability__list li {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--ink2);
+    margin-bottom: 8px;
+  }
+
+  @media (max-width: 1080px) {
+    .capabilities__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .capabilities__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

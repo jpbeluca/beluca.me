@@ -1,0 +1,113 @@
+---
+import SectionLabel from "./SectionLabel.astro";
+import { profile } from "../data/profile";
+
+const posts = profile.posts.slice(0, 4);
+---
+
+<section id="writing" class="writing">
+  <SectionLabel n="II" title="Recent writing" />
+  <div class="writing__grid">
+    {
+      posts.map((post, i) => (
+        <a
+          href={`/writing/${post.slug}`}
+          class:list={[
+            "writing__card",
+            i % 2 === 0 ? "writing__card--left" : "writing__card--right",
+          ]}
+        >
+          <div class="writing__meta">
+            <span class="writing__tag">{post.tag}</span>
+            <span class="writing__date">
+              {post.date} · {post.readTime}
+            </span>
+          </div>
+          <h3 class="writing__title">{post.title}</h3>
+          <p class="writing__excerpt">{post.excerpt}</p>
+        </a>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .writing {
+    padding: 64px var(--page-pad-x);
+    border-top: 1px solid var(--rule);
+  }
+
+  .writing__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .writing__card {
+    display: block;
+    padding: 28px 32px 28px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--ink);
+    transition: background 0.2s;
+  }
+
+  .writing__card--left {
+    border-right: 1px solid var(--rule);
+    padding-left: 0;
+  }
+
+  .writing__card--right {
+    padding-left: 32px;
+  }
+
+  .writing__card:hover {
+    background: var(--bg-alt);
+  }
+
+  .writing__meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .writing__tag {
+    color: var(--accent);
+  }
+
+  .writing__title {
+    font-family: var(--font-sans);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.25;
+    margin: 0 0 10px;
+    letter-spacing: -0.3px;
+  }
+
+  .writing__excerpt {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink2);
+    font-style: italic;
+    margin: 0;
+  }
+
+  @media (max-width: 820px) {
+    .writing__grid {
+      grid-template-columns: 1fr;
+    }
+    .writing__card,
+    .writing__card--left,
+    .writing__card--right {
+      border-right: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+</style>

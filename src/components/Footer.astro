@@ -1,0 +1,30 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <span>© {year} John Beluca — Set in Geist & Geist Mono</span>
+  <span>Calgary, Alberta</span>
+</footer>
+
+<style>
+  .footer {
+    padding: 24px var(--page-pad-x);
+    background: var(--ink);
+    color: var(--dark-label);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid var(--dark-rule);
+  }
+
+  @media (max-width: 600px) {
+    .footer {
+      flex-direction: column;
+      gap: 8px;
+    }
+  }
+</style>
