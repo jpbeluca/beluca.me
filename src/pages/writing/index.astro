@@ -1,0 +1,155 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import SectionLabel from "../../components/SectionLabel.astro";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const fmt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+});
+---
+
+<BaseLayout
+  title="Writing — John Beluca"
+  description="Notes on AI systems, agentic architectures, AWS, and the slower work of leading engineering."
+>
+  <span id="top"></span>
+  <Header />
+
+  <main>
+    <section class="archive">
+      <div class="archive__head">
+        <SectionLabel n="II" title="Writing" />
+        <p class="archive__lead">
+          Notes on the AI systems I'm shipping, the AWS plumbing under them,
+          and the people side of architecting at the C-level.
+        </p>
+      </div>
+
+      <div class="archive__grid">
+        {
+          posts.map((post, i) => (
+            <a
+              href={`/writing/${post.id}/`}
+              class:list={[
+                "archive__card",
+                i % 2 === 0 ? "archive__card--left" : "archive__card--right",
+              ]}
+            >
+              <div class="archive__meta">
+                <span class="archive__tag">{post.data.tag}</span>
+                <span class="archive__date">
+                  {fmt.format(post.data.date)} · {post.data.readTime}
+                </span>
+              </div>
+              <h3 class="archive__title">{post.data.title}</h3>
+              <p class="archive__excerpt">{post.data.excerpt}</p>
+            </a>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .archive {
+    padding: 64px var(--page-pad-x);
+  }
+
+  .archive__head {
+    margin-bottom: 12px;
+  }
+
+  .archive__lead {
+    font-family: var(--font-sans);
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink2);
+    margin: 0 0 32px;
+    max-width: 640px;
+  }
+
+  .archive__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  .archive__card {
+    display: block;
+    padding: 28px 32px 28px 0;
+    border-bottom: 1px solid var(--rule);
+    text-decoration: none;
+    color: var(--ink);
+    transition: background 0.2s;
+  }
+
+  .archive__card--left {
+    border-right: 1px solid var(--rule);
+    padding-left: 0;
+  }
+
+  .archive__card--right {
+    padding-left: 32px;
+  }
+
+  .archive__card:hover {
+    background: var(--bg-alt);
+  }
+
+  .archive__meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+
+  .archive__tag {
+    color: var(--accent);
+  }
+
+  .archive__title {
+    font-family: var(--font-sans);
+    font-size: 26px;
+    font-weight: 500;
+    line-height: 1.25;
+    margin: 0 0 10px;
+    letter-spacing: -0.3px;
+  }
+
+  .archive__excerpt {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--ink2);
+    font-style: italic;
+    margin: 0;
+  }
+
+  @media (max-width: 820px) {
+    .archive__grid {
+      grid-template-columns: 1fr;
+    }
+    .archive__card,
+    .archive__card--left,
+    .archive__card--right {
+      border-right: none;
+      padding-left: 0;
+      padding-right: 0;
+    }
+  }
+</style>

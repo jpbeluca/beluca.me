@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Don't index the agent endpoint or generated OG image routes
+Disallow: /api/
+
+Sitemap: https://beluca.me/sitemap-index.xml

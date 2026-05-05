@@ -22,7 +22,7 @@
   --font-mono: "Geist Mono", "JetBrains Mono", ui-monospace, monospace;
 
   /* Layout */
-  --page-pad-x: 72px;
+  --page-pad-x: max(72px, calc((100% - 1280px) / 2));
 
   color-scheme: light;
 }

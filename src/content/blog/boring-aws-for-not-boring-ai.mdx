@@ -1,0 +1,41 @@
+---
+title: "A boring AWS architecture for a not-boring AI product"
+excerpt: "The reference architecture I've used to ship three production AI systems. ECS, Lambda, SQS — nothing fancy, and that's the point."
+date: 2026-02-20
+readTime: "12 min"
+tag: "Cloud"
+---
+
+Every six months a new "AI-native" infrastructure stack gets pitched. Vector-only databases. Inference platforms. AI orchestration runtimes. They're interesting. I don't use them.
+
+The architecture I use to ship production AI systems is the same architecture I'd ship a CRUD app on, with two adjustments. Three systems, three different industries, all running on it.
+
+## The shape
+
+- **API Gateway → Lambda** for synchronous calls. The agent endpoint, the chat endpoint, the suggest endpoint. Lambda handles the LLM client SDK calls and returns within a few hundred ms.
+- **SQS → Lambda** for async work. Embedding generation, document re-indexing, batch summaries. Anything that takes more than a couple of seconds gets queued.
+- **ECS Fargate** for long-running stateful workloads. Document processors that hold a model in memory, scrapers, anything that doesn't fit Lambda's 15-minute envelope.
+- **RDS Postgres** for transactional data, including embeddings via `pgvector`. I have not yet hit a use case where a dedicated vector DB beat `pgvector` on a real workload — and the operational cost of a second database is real.
+- **S3** for documents, source files, and cold storage of generated artifacts.
+- **CloudWatch + structured logs** for observability. No exotic tracing yet.
+
+The two AI-specific adjustments:
+
+1. **Token usage and latency are first-class metrics.** Every LLM call gets logged with model, input tokens, output tokens, latency, and a request ID. CloudWatch Insights queries answer "what's my P95 cost per conversation?" in five seconds.
+2. **Embedding pipelines run on SQS with deliberate concurrency caps.** Embedding APIs rate-limit aggressively. A naive Lambda fan-out will get you throttled and cost you a retry storm. Cap concurrency at the queue level.
+
+## Why not the cool stack
+
+The cool stack is built around the assumption that AI workloads are fundamentally different from other workloads. They aren't. They're CRUD apps with a slow third-party dependency.
+
+You already know how to build CRUD apps that handle slow third-party dependencies. Reuse that knowledge. The novel parts of an AI system are in the prompts, the tools, the chunking — not in the infra under it.
+
+## When to add complexity
+
+Three signals I watch for before reaching for something more exotic:
+
+- **Cold-start latency on the first message of a conversation matters and Lambda init is hurting.** Move that endpoint to ECS or use Lambda SnapStart.
+- **Vector search latency is dominating the response.** Profile first — usually it isn't, even at a few million rows on `pgvector`.
+- **Embedding throughput is bottlenecked.** This is the only one where I've reached for managed services. Bedrock or a dedicated embedding API beats running your own.
+
+Until those signals appear, the boring architecture wins.

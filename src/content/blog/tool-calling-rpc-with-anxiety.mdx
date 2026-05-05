@@ -1,0 +1,35 @@
+---
+title: "Tool-calling is just a remote procedure call with anxiety"
+excerpt: "How I think about designing tools for agents — naming, scoping, idempotency, and why your agent keeps looping."
+date: 2026-03-12
+readTime: "6 min"
+tag: "Agents"
+---
+
+When I'm designing tools for an agent, I treat them like RPC endpoints with one extra requirement: an LLM, which sometimes pattern-matches over them based on incomplete context, has to pick the right one.
+
+That framing changes the design.
+
+## Name tools the way you'd name an API
+
+Bad: `query`, `search`, `get_data`. The agent will call them at the wrong time, every time.
+
+Good: `find_customer_by_email`, `list_invoices_for_customer`, `get_payment_status`. The verb-noun structure mirrors what the model expects from training, and the parameters fall out naturally.
+
+## Scope each tool to one job
+
+The temptation is to build one big `customer_action` tool with a `mode` parameter. Don't. The agent will pick the wrong mode under pressure. Split it. Five small tools beat one swiss army knife every time — the model's selection problem stays simple, and your error logs become readable.
+
+## Make every tool idempotent if you possibly can
+
+Agents loop. They will call the same tool twice within a single turn. They will retry failed calls. If your tool isn't idempotent, you'll get duplicate writes — and you'll discover this in production, not staging.
+
+Either make the operation idempotent (upserts, conditional writes), or return an error fast on the second call with the same arguments. Don't let the agent silently double-bill a customer because retry logic looked clean.
+
+## Why your agent keeps looping
+
+The most common loop I see: the agent calls a tool, gets back data it doesn't quite know what to do with, and calls the same tool again with slightly different arguments hoping for a different shape of result.
+
+The fix is almost always in the tool's response. Return *exactly* what the agent needs to make the next decision — no more, no less. Big nested JSON blobs are a loop generator. Flat, predictable shapes with the answer in a known field are not.
+
+If the agent is looping, the tool is leaking ambiguity into the conversation. Tighten the response, not the prompt.

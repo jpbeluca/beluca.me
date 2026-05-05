@@ -20,15 +20,6 @@ export type Project = {
   details: string[];
 };
 
-export type Post = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  readTime: string;
-  tag: string;
-};
-
 export type Skills = Record<string, string[]>;
 
 export const profile = {
@@ -195,45 +186,6 @@ export const profile = {
       "Cross-functional Leadership",
     ],
   } satisfies Skills,
-
-  posts: [
-    {
-      slug: "rag-retrieval-bad",
-      title: "Why your RAG retrieval is bad (and it's probably not the embeddings)",
-      excerpt:
-        "After shipping half a dozen RAG systems into production, I keep seeing the same retrieval failures. The model is rarely the problem — chunking and metadata are.",
-      date: "Apr 2026",
-      readTime: "8 min",
-      tag: "RAG",
-    },
-    {
-      slug: "tool-calling-rpc-with-anxiety",
-      title: "Tool-calling is just a remote procedure call with anxiety",
-      excerpt:
-        "How I think about designing tools for agents — naming, scoping, idempotency, and why your agent keeps looping.",
-      date: "Mar 2026",
-      readTime: "6 min",
-      tag: "Agents",
-    },
-    {
-      slug: "boring-aws-for-not-boring-ai",
-      title: "A boring AWS architecture for a not-boring AI product",
-      excerpt:
-        "The reference architecture I've used to ship three production AI systems. ECS, Lambda, SQS — nothing fancy, and that's the point.",
-      date: "Feb 2026",
-      readTime: "12 min",
-      tag: "Cloud",
-    },
-    {
-      slug: "notes-from-architecting-c-level",
-      title: "Notes from architecting at the C-level",
-      excerpt:
-        "What changes when the technical decisions you make end up in a board deck three weeks later.",
-      date: "Jan 2026",
-      readTime: "5 min",
-      tag: "Leadership",
-    },
-  ] satisfies Post[],
 };
 
 export type Profile = typeof profile;

@@ -1,0 +1,33 @@
+---
+title: "Notes from architecting at the C-level"
+excerpt: "What changes when the technical decisions you make end up in a board deck three weeks later."
+date: 2026-01-08
+readTime: "5 min"
+tag: "Leadership"
+---
+
+Most of my work over the last few years has been with founders and C-level execs — discovery, scoping, architecture, then leading the engineering through delivery. The technical work is the same; the *shape* of the work is different.
+
+A few notes from sitting in those rooms.
+
+## They are not asking what you think they're asking
+
+When a CEO asks "can we do this in three months", they are almost never asking a feasibility question. They are asking whether they can commit to a date in front of a board, an investor, or a customer. The right answer is rarely a number — it's a sentence describing what would have to be true for that date to hold, and what falls out if it slips.
+
+Engineers default to the feasibility answer. That answer is usually correct and almost always unhelpful at this altitude.
+
+## The architecture diagram is not for engineers
+
+When I draw a system for an exec audience, the boxes are not services. They are responsibilities the business cares about — "the part that talks to customers", "the part that holds money", "the part that breaks if the integration partner changes". That is the level the conversation happens at. The actual service topology is a layer down and rarely surfaces.
+
+If your diagram has Kafka on it in a board meeting, the diagram is wrong.
+
+## Default to fewer, bigger commitments
+
+C-level stakeholders track maybe three to five technical commitments at a time. A roadmap with twenty items reads as no roadmap. Pick the three things that matter for the next quarter, name them in their language, and protect them ruthlessly. The other seventeen items get done; they just don't show up on this surface.
+
+## Translation is the job
+
+A solutions architect who can build the system but can't explain it to a non-technical exec is a senior engineer with extra steps. A solutions architect who can translate between an engineering team and a leadership team is the one who actually moves the project forward.
+
+The translation work is the work. Not a tax on the work.

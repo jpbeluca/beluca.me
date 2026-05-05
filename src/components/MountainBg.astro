@@ -1,0 +1,126 @@
+---
+// Wireframe Rocky Mountain reference behind the hero — overlapping
+// contour-style polylines, very thin strokes, very low opacity.
+// Ported verbatim from EdV2MountainBg in design_handoff_beluca_me/direction-editorial-v2.jsx.
+
+type Peak = [number, number];
+type RidgeDef = { y: number; peaks: Peak[] };
+
+const ridgeDefs: RidgeDef[] = [
+  { y: 720, peaks: [[100, 40], [260, 90], [360, 55], [510, 140], [640, 80], [800, 170], [940, 110], [1080, 150], [1230, 90]] },
+  { y: 760, peaks: [[60, 30], [200, 110], [340, 70], [470, 180], [600, 130], [760, 210], [900, 160], [1040, 200], [1200, 150]] },
+  { y: 800, peaks: [[120, 50], [280, 150], [440, 120], [580, 230], [720, 180], [880, 260], [1020, 220], [1180, 250]] },
+  { y: 840, peaks: [[60, 80], [220, 200], [360, 170], [500, 280], [650, 230], [820, 310], [980, 270], [1140, 300]] },
+];
+
+const ridges = ridgeDefs.map((r, ri) => {
+  let path = `M -50 ${r.y}`;
+  for (const [x, h] of r.peaks) {
+    const peakY = r.y - h;
+    path += ` L ${x - 24} ${peakY + 8} L ${x} ${peakY} L ${x + 30} ${peakY + 12}`;
+  }
+  path += ` L 1330 ${r.y}`;
+  return {
+    d: path,
+    opacity: 0.32 - ri * 0.06,
+    sw: 0.9 - ri * 0.1,
+  };
+});
+
+const triangles: [number, number, number, number, number, number][] = [
+  [510, 600, 640, 720, 580, 720],
+  [800, 590, 940, 710, 870, 710],
+  [800, 590, 940, 710, 1080, 610],
+  [1080, 610, 1230, 670, 1150, 760],
+  [260, 670, 360, 705, 320, 760],
+  [510, 600, 580, 720, 470, 760],
+  [800, 590, 870, 710, 760, 760],
+  [940, 710, 1020, 760, 880, 800],
+];
+---
+
+<svg
+  class="mountain-bg"
+  width="100%"
+  height="100%"
+  viewBox="0 0 1280 920"
+  preserveAspectRatio="xMidYMax slice"
+  aria-hidden="true"
+>
+  <defs>
+    <pattern id="mtn-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path
+        d="M 40 0 L 0 0 0 40"
+        fill="none"
+        stroke="var(--ink)"
+        stroke-width="0.4"
+        opacity="0.06"
+      />
+    </pattern>
+    <linearGradient id="mtn-fade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--bg)" stop-opacity="0.7" />
+      <stop offset="60%" stop-color="var(--bg)" stop-opacity="0" />
+      <stop offset="100%" stop-color="var(--bg)" stop-opacity="0.6" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1280" height="920" fill="url(#mtn-grid)" />
+
+  {
+    ridges.map((r) => (
+      <path
+        d={r.d}
+        fill="none"
+        stroke="var(--ink)"
+        stroke-width={r.sw}
+        opacity={r.opacity}
+        stroke-linejoin="round"
+      />
+    ))
+  }
+
+  <g stroke="var(--accent)" stroke-width="0.4" opacity="0.35" fill="none">
+    {
+      triangles.map((t) => (
+        <polygon points={`${t[0]},${t[1]} ${t[2]},${t[3]} ${t[4]},${t[5]}`} />
+      ))
+    }
+  </g>
+
+  <g
+    font-family="Geist Mono, JetBrains Mono, monospace"
+    font-size="9"
+    fill="var(--accent-2)"
+    opacity="0.7"
+  >
+    <circle cx="800" cy="590" r="2.5" fill="var(--accent-2)" />
+    <line
+      x1="800"
+      y1="590"
+      x2="800"
+      y2="555"
+      stroke="var(--accent-2)"
+      stroke-width="0.5"
+    />
+    <text x="806" y="552">▲ 3,162m  Mt. Rundle</text>
+  </g>
+
+  <g
+    font-family="Geist Mono, JetBrains Mono, monospace"
+    font-size="9"
+    fill="var(--muted)"
+    opacity="0.6"
+  >
+    <text x="40" y="900">FIG. 01 — Bow Valley silhouette · wireframe study · 1:1</text>
+  </g>
+
+  <rect width="1280" height="920" fill="url(#mtn-fade)" />
+</svg>
+
+<style>
+  .mountain-bg {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+</style>

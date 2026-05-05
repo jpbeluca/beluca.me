@@ -1,8 +1,15 @@
 ---
+import { getCollection } from "astro:content";
 import SectionLabel from "./SectionLabel.astro";
-import { profile } from "../data/profile";
 
-const posts = profile.posts.slice(0, 4);
+const posts = (await getCollection("blog"))
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime())
+  .slice(0, 4);
+
+const fmt = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+});
 ---
 
 <section id="writing" class="writing">
@@ -11,20 +18,20 @@ const posts = profile.posts.slice(0, 4);
     {
       posts.map((post, i) => (
         <a
-          href={`/writing/${post.slug}`}
+          href={`/writing/${post.id}/`}
           class:list={[
             "writing__card",
             i % 2 === 0 ? "writing__card--left" : "writing__card--right",
           ]}
         >
           <div class="writing__meta">
-            <span class="writing__tag">{post.tag}</span>
+            <span class="writing__tag">{post.data.tag}</span>
             <span class="writing__date">
-              {post.date} · {post.readTime}
+              {fmt.format(post.data.date)} · {post.data.readTime}
             </span>
           </div>
-          <h3 class="writing__title">{post.title}</h3>
-          <p class="writing__excerpt">{post.excerpt}</p>
+          <h3 class="writing__title">{post.data.title}</h3>
+          <p class="writing__excerpt">{post.data.excerpt}</p>
         </a>
       ))
     }

@@ -1,0 +1,37 @@
+---
+title: "Why your RAG retrieval is bad (and it's probably not the embeddings)"
+excerpt: "After shipping half a dozen RAG systems into production, I keep seeing the same retrieval failures. The model is rarely the problem — chunking and metadata are."
+date: 2026-04-15
+readTime: "8 min"
+tag: "RAG"
+---
+
+Every RAG system I've shipped, I've watched the same conversation play out: retrieval is bad, the team blames the embedding model, swaps it for a bigger one, and gets marginal improvement. Then they swap the vector database. Same result. Then they fine-tune. Same result.
+
+The model is almost never the problem.
+
+## Chunking is the load-bearing decision
+
+The first time a document hits your pipeline, you make a one-shot decision about how to slice it. That decision sticks for the lifetime of the index. Get it wrong and no amount of clever retrieval logic recovers it — you're searching over fragments that don't carry their own context.
+
+Three rules I now apply by default:
+
+- **Chunk on semantic boundaries, not character counts.** Headings, sections, paragraphs — whatever the source document actually uses. Fixed-size chunks split mid-thought and produce noise.
+- **Overlap, but only a little.** 10–15% beats both 0% and 50%. More overlap is just paying for the same content twice.
+- **Keep enclosing context in the chunk itself.** Prepend the document title and section heading to every chunk's text. Embeddings carry that context into vector space and retrieval gets dramatically better — for free.
+
+## Metadata is retrieval, not decoration
+
+Most teams treat metadata as something the UI displays. It should be the first filter on every query. Date, doc type, source system, owning team — narrow the search space *before* you do similarity search, not after.
+
+A simple metadata filter on document type cut my retrieval errors by more than half on one project. The embedding model was fine. The index just had too much in it.
+
+## What to actually look at when retrieval is failing
+
+Before you blame the model:
+
+1. Pull the top-5 retrieved chunks for a failing query. Read them.
+2. Ask whether a human reading just those five chunks could answer the question.
+3. If the answer is no, the problem is upstream of the model.
+
+Nine times out of ten, the answer is no — and the fix is in chunking or metadata, not embeddings.

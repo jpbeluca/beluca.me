@@ -1,0 +1,200 @@
+---
+import MountainBg from "./MountainBg.astro";
+import Chat from "./Chat.tsx";
+
+const stats = [
+  { n: "12+", label: "Years architecting" },
+  { n: "40+", label: "Clients delivered" },
+  { n: "8+", label: "Years on AWS" },
+  { n: "06", label: "Industries" },
+];
+---
+
+<section class="hero" id="top-hero">
+  <div class="hero__bg">
+    <MountainBg />
+  </div>
+
+  <div class="hero__inner">
+    <div class="hero__left">
+      <div class="status-pill">
+        <span class="status-pill__dot" aria-hidden="true"></span>
+        Available for new engagements
+      </div>
+
+      <h1 class="hero__title">
+        Hi, I'm <span class="hero__name">John Beluca</span> — a Senior Solutions Architect shipping AI systems into production.
+      </h1>
+
+      <p class="hero__lead">
+        12+ years architecting cloud and software for 40+ clients. The last
+        year focused on agentic AI, RAG pipelines, and multi-provider LLM
+        integrations — embedded into real client products, not demos.
+      </p>
+
+      <div class="hero__cta-row">
+        <a class="hero__cta" href="#work">See selected work →</a>
+      </div>
+
+      <div class="hero__stats">
+        {
+          stats.map((s) => (
+            <div class="stat">
+              <div class="stat__n">{s.n}</div>
+              <div class="stat__label">{s.label}</div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+
+    <aside class="hero__right" aria-label="Agent chat">
+      <Chat client:load />
+    </aside>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding: 72px var(--page-pad-x) 56px;
+    min-height: 720px;
+    background: var(--bg);
+  }
+
+  .hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  .hero__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 64px;
+    align-items: flex-start;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 32px;
+    padding: 5px 12px;
+    border: 1px solid var(--accent);
+  }
+
+  .status-pill__dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent);
+    display: inline-block;
+  }
+
+  .hero__title {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    letter-spacing: -2px;
+    margin: 0;
+    max-width: 720px;
+    color: var(--ink);
+    line-height: 1.2;
+    font-size: 60px;
+  }
+
+  .hero__name {    
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .hero__lead {
+    font-family: var(--font-sans);
+    font-size: 19px;
+    line-height: 1.55;
+    color: var(--ink2);
+    margin: 32px 0 0;
+    max-width: 600px;
+  }
+
+  .hero__cta-row {
+    margin-top: 36px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .hero__cta {
+    padding: 12px 22px;
+    background: var(--ink);
+    color: var(--bg);
+    text-decoration: none;
+    font-size: 14px;
+    font-family: var(--font-mono);
+    letter-spacing: 0.5px;
+    transition: background 0.15s;
+  }
+
+  .hero__cta:hover {
+    background: var(--accent);
+  }
+
+  .hero__stats {
+    margin-top: 56px;
+    display: flex;
+    gap: 48px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding-top: 32px;
+    border-top: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+
+  .stat__n {
+    font-family: var(--font-sans);
+    font-size: 36px;
+    line-height: 1;
+    color: var(--ink);
+    font-weight: 400;
+  }
+
+  .stat__label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 1024px) {
+    .hero__title {
+      font-size: 56px;
+    }
+  }
+
+  @media (max-width: 820px) {
+    .hero {
+      padding: 48px var(--page-pad-x) 40px;
+      min-height: 0;
+    }
+    .hero__inner {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+    .hero__title {
+      font-size: 44px;
+      letter-spacing: -1px;
+    }
+    .hero__stats {
+      gap: 28px;
+    }
+  }
+</style>
