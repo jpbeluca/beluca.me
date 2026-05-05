@@ -4,7 +4,6 @@ import { profile } from "../data/profile";
 const rows = [
   { label: "Email", value: profile.email, href: `mailto:${profile.email}` },
   { label: "LinkedIn", value: profile.linkedin, href: profile.linkedinUrl },
-  { label: "Phone", value: profile.phone, href: `tel:${profile.phone.replace(/[^0-9+]/g, "")}` },
   { label: "Location", value: `${profile.location} · open to remote`, href: undefined },
 ];
 ---

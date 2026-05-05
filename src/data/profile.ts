@@ -29,7 +29,6 @@ export const profile = {
   focus: "AI & LLM Systems",
   location: "Calgary, Canada",
   email: "jpbeluca@gmail.com",
-  phone: "(437) 254-0935",
   linkedin: "linkedin.com/in/beluca",
   linkedinUrl: "https://www.linkedin.com/in/beluca",
 
