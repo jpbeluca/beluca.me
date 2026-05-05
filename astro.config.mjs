@@ -9,4 +9,9 @@ export default defineConfig({
   output: 'static',
   adapter: vercel(),
   integrations: [mdx(), react(), sitemap()],
+  vite: {
+    ssr: {
+      external: ['@resvg/resvg-js'],
+    },
+  },
 });
