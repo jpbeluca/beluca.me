@@ -96,16 +96,11 @@
   white-space: pre-wrap;
 }
 
-.toolLine,
 .generatingLine {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--muted);
-  padding-left: 36px;
-}
-
-.toolStep {
-  color: var(--accent);
+  padding-top: 5px;
 }
 
 .dot {

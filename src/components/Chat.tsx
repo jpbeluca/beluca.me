@@ -9,13 +9,10 @@ const SUGGESTED = [
   "Is he open to contracts?",
 ];
 
-const TOOL_STEPS = [
-  "searching resume",
-  "retrieving project context",
-  "composing answer",
-];
-
 const CONTACT_EMAIL = "jpbeluca@gmail.com";
+const FALLBACK_REPLY = `Sorry, I can't reach the model right now. Email John directly: ${CONTACT_EMAIL}`;
+
+type SSEEvent = { chunk?: string; replace?: string; done?: boolean };
 
 export default function Chat() {
   const [messages, setMessages] = useState<Message[]>([
@@ -27,14 +24,25 @@ export default function Chat() {
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [toolStep, setToolStep] = useState<string | null>(null);
+  const [streaming, setStreaming] = useState(false);
   const messagesRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (messagesRef.current) {
       messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
     }
-  }, [messages, loading, toolStep]);
+  }, [messages, loading]);
+
+  function appendToLastAgent(setter: (prev: string) => string) {
+    setMessages((m) => {
+      const next = [...m];
+      const last = next[next.length - 1];
+      if (last && last.role === "agent") {
+        next[next.length - 1] = { ...last, content: setter(last.content) };
+      }
+      return next;
+    });
+  }
 
   async function ask(q?: string) {
     if (loading) return;
@@ -42,14 +50,13 @@ export default function Chat() {
     if (!question) return;
 
     setInput("");
-    setMessages((m) => [...m, { role: "user", content: question }]);
+    setMessages((m) => [
+      ...m,
+      { role: "user", content: question },
+      { role: "agent", content: "" },
+    ]);
     setLoading(true);
-
-    for (const t of TOOL_STEPS) {
-      setToolStep(t);
-      await new Promise((r) => setTimeout(r, 280));
-    }
-    setToolStep(null);
+    setStreaming(false);
 
     try {
       const res = await fetch("/api/agent", {
@@ -57,60 +64,120 @@ export default function Chat() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ question }),
       });
-      if (!res.ok) throw new Error(`agent ${res.status}`);
-      const data = (await res.json()) as { answer?: string };
-      const reply =
-        data.answer?.trim() ||
-        `Sorry, I can't reach the model right now. Email John directly: ${CONTACT_EMAIL}`;
-      setMessages((m) => [...m, { role: "agent", content: reply }]);
+
+      if (res.status === 429) {
+        appendToLastAgent(() => FALLBACK_REPLY);
+        return;
+      }
+      if (!res.ok || !res.body) {
+        throw new Error(`agent ${res.status}`);
+      }
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let gotAnything = false;
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+
+        // SSE events are delimited by \n\n
+        let idx: number;
+        while ((idx = buffer.indexOf("\n\n")) !== -1) {
+          const rawEvent = buffer.slice(0, idx);
+          buffer = buffer.slice(idx + 2);
+          const dataLines = rawEvent
+            .split("\n")
+            .filter((l) => l.startsWith("data:"))
+            .map((l) => l.slice(5).replace(/^ /, ""));
+          if (dataLines.length === 0) continue;
+          const dataStr = dataLines.join("\n");
+          let evt: SSEEvent;
+          try {
+            evt = JSON.parse(dataStr) as SSEEvent;
+          } catch {
+            continue;
+          }
+          if (typeof evt.chunk === "string") {
+            const chunk = evt.chunk;
+            if (!gotAnything) {
+              gotAnything = true;
+              setStreaming(true);
+            }
+            appendToLastAgent((prev) => prev + chunk);
+          } else if (typeof evt.replace === "string") {
+            const replacement = evt.replace;
+            gotAnything = true;
+            setStreaming(true);
+            appendToLastAgent(() => replacement);
+          }
+          if (evt.done) {
+            setStreaming(false);
+          }
+        }
+      }
+
+      if (!gotAnything) {
+        appendToLastAgent(() => FALLBACK_REPLY);
+      }
     } catch {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "agent",
-          content: `Sorry, I can't reach the model right now. Email John directly: ${CONTACT_EMAIL}`,
-        },
-      ]);
+      appendToLastAgent((prev) => (prev ? prev : FALLBACK_REPLY));
     } finally {
       setLoading(false);
+      setStreaming(false);
     }
   }
+
+  const showThinking =
+    loading &&
+    !streaming &&
+    messages.length > 0 &&
+    messages[messages.length - 1]?.role === "agent" &&
+    messages[messages.length - 1]?.content === "";
 
   return (
     <div className={styles.card}>
       <div className={styles.header}>
         <span className={styles.headerDot} aria-hidden="true" />
         <span className={styles.headerTitle}>ask the agent</span>
-        <span className={styles.headerMeta}>claude · RAG over resume</span>
+        <span className={styles.headerMeta}>openai · grounded on profile</span>
       </div>
 
       <div ref={messagesRef} className={styles.messages}>
-        {messages.map((m, i) =>
-          m.role === "user" ? (
-            <div key={i} className={styles.userMsg}>
-              <div className={styles.userBubble}>{m.content}</div>
-            </div>
-          ) : (
+        {messages.map((m, i) => {
+          if (m.role === "user") {
+            return (
+              <div key={i} className={styles.userMsg}>
+                <div className={styles.userBubble}>{m.content}</div>
+              </div>
+            );
+          }
+          const isLastAgentEmpty =
+            i === messages.length - 1 && m.content === "" && showThinking;
+          if (isLastAgentEmpty) {
+            return (
+              <div key={i} className={styles.agentMsg}>
+                <div className={styles.agentAvatar} aria-hidden="true">
+                  b
+                </div>
+                <div className={styles.generatingLine}>
+                  thinking
+                  <span className={styles.dot} aria-hidden="true" />
+                </div>
+              </div>
+            );
+          }
+          return (
             <div key={i} className={styles.agentMsg}>
               <div className={styles.agentAvatar} aria-hidden="true">
                 b
               </div>
               <div className={styles.agentText}>{m.content}</div>
             </div>
-          ),
-        )}
-        {toolStep && (
-          <div className={styles.toolLine}>
-            <span className={styles.toolStep}>→ {toolStep}</span>
-            <span className={styles.dot} aria-hidden="true" />
-          </div>
-        )}
-        {loading && !toolStep && (
-          <div className={styles.generatingLine}>
-            generating
-            <span className={styles.dot} aria-hidden="true" />
-          </div>
-        )}
+          );
+        })}
       </div>
 
       <div className={styles.footer}>

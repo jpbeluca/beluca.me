@@ -38,7 +38,7 @@ export const profile = {
   about: [
     "I'm a Solutions Architect with 12+ years building cloud and software systems for 40+ clients across manufacturing, SaaS, healthcare, agribusiness, retail, and engineering.",
     "Over the last year I've focused on architecting and shipping AI/LLM-powered solutions into production — agentic systems with tool-calling, RAG pipelines on vector databases, multi-provider integrations across OpenAI, Anthropic, and Gemini.",
-    "I work at the intersection of business strategy and technical execution — sitting with founders and C-levels during discovery, then leading engineering teams through delivery and long-term operations.",
+    "I work at the intersection of business strategy and technical execution — sitting with founders and C-levels during discovery, then leading engineering teams through delivery and long-term operations. I'm open to contracts, just contact me on my email",
   ],
 
   stats: {
