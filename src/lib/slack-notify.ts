@@ -48,14 +48,23 @@ function buildText(event: SlackChatEvent): string {
 export async function notifySlack(event: SlackChatEvent): Promise<void> {
   try {
     const url = import.meta.env.SLACK_WEBHOOK_URL as string | undefined;
-    if (!url) return;
-    await fetch(url, {
+    if (!url) {
+      console.warn("[slack-notify] SLACK_WEBHOOK_URL not set; skipping");
+      return;
+    }
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: buildText(event) }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-  } catch {
+    if (!res.ok) {
+      console.error(
+        `[slack-notify] webhook returned ${res.status} ${res.statusText}`,
+      );
+    }
+  } catch (err) {
     // Never throw — Slack failures must not break the chat response.
+    console.error("[slack-notify] failed:", err);
   }
 }

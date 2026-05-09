@@ -1,5 +1,6 @@
 import type { APIRoute } from "astro";
 import OpenAI from "openai";
+import { waitUntil } from "@vercel/functions";
 import { profile } from "../../data/profile";
 import { buildSystemPrompt, REFUSAL_STRING } from "../../lib/agent-prompt";
 import { checkRateLimit } from "../../lib/rate-limit";
@@ -99,14 +100,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
 
   // 2. Anti-injection pre-filter — short-circuit obvious patterns
   if (looksLikeInjection(question)) {
-    void notifySlack({
-      outcome: "refusal",
-      question,
-      answer: REFUSAL_STRING,
-      ip,
-      userAgent,
-      geo,
-    });
+    waitUntil(
+      notifySlack({
+        outcome: "refusal",
+        question,
+        answer: REFUSAL_STRING,
+        ip,
+        userAgent,
+        geo,
+      }),
+    );
     return sseStreamFromString(REFUSAL_STRING);
   }
 
@@ -128,14 +131,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   // 4. OpenAI call
   const apiKey = import.meta.env.OPENAI_API_KEY;
   if (!apiKey) {
-    void notifySlack({
-      outcome: "fallback",
-      question,
-      answer: FALLBACK,
-      ip,
-      userAgent,
-      geo,
-    });
+    waitUntil(
+      notifySlack({
+        outcome: "fallback",
+        question,
+        answer: FALLBACK,
+        ip,
+        userAgent,
+        geo,
+      }),
+    );
     return sseStreamFromString(FALLBACK);
   }
 
@@ -217,14 +222,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         } catch {
           // ignore
         }
-        void notifySlack({
-          outcome: "fallback",
-          question,
-          answer: msg,
-          ip,
-          userAgent,
-          geo,
-        });
+        waitUntil(
+          notifySlack({
+            outcome: "fallback",
+            question,
+            answer: msg,
+            ip,
+            userAgent,
+            geo,
+          }),
+        );
         controller.close();
       };
 
@@ -283,14 +290,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           // Override whatever was streamed with the canonical refusal string.
           controller.enqueue(encoder.encode(sseEvent({ replace: REFUSAL_STRING })));
           controller.enqueue(encoder.encode(sseEvent({ done: true })));
-          void notifySlack({
-            outcome: "refusal",
-            question,
-            answer: REFUSAL_STRING,
-            ip,
-            userAgent,
-            geo,
-          });
+          waitUntil(
+            notifySlack({
+              outcome: "refusal",
+              question,
+              answer: REFUSAL_STRING,
+              ip,
+              userAgent,
+              geo,
+            }),
+          );
           controller.close();
           return;
         }
@@ -303,14 +312,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           );
         }
         controller.enqueue(encoder.encode(sseEvent({ done: true })));
-        void notifySlack({
-          outcome: "in_scope",
-          question,
-          answer: finalAnswer,
-          ip,
-          userAgent,
-          geo,
-        });
+        waitUntil(
+          notifySlack({
+            outcome: "in_scope",
+            question,
+            answer: finalAnswer,
+            ip,
+            userAgent,
+            geo,
+          }),
+        );
         controller.close();
       } catch (err) {
         fail(FALLBACK);
