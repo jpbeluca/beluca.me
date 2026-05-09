@@ -3,6 +3,7 @@ import OpenAI from "openai";
 import { profile } from "../../data/profile";
 import { buildSystemPrompt, REFUSAL_STRING } from "../../lib/agent-prompt";
 import { checkRateLimit } from "../../lib/rate-limit";
+import { notifySlack } from "../../lib/slack-notify";
 
 export const prerender = false;
 
@@ -72,18 +73,44 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return jsonError(413, { error: "question too long" });
   }
 
-  // 2. Anti-injection pre-filter — short-circuit obvious patterns
-  if (looksLikeInjection(question)) {
-    return sseStreamFromString(REFUSAL_STRING);
-  }
-
-  // 3. Rate limit
+  // Capture visitor metadata before the rate-limit and OpenAI branches.
   let ip = "unknown";
   try {
     ip = clientAddress ?? "unknown";
   } catch {
     ip = "unknown";
   }
+  const userAgent = request.headers.get("user-agent") ?? "";
+  // Vercel URL-encodes city headers; malformed values (rare but possible
+  // from spoofed headers or upstream proxies) make decodeURIComponent throw.
+  const safeDecode = (s: string | null): string | undefined => {
+    if (!s) return undefined;
+    try {
+      return decodeURIComponent(s);
+    } catch {
+      return s;
+    }
+  };
+  const geo = {
+    country: request.headers.get("x-vercel-ip-country") ?? undefined,
+    region: request.headers.get("x-vercel-ip-country-region") ?? undefined,
+    city: safeDecode(request.headers.get("x-vercel-ip-city")),
+  };
+
+  // 2. Anti-injection pre-filter — short-circuit obvious patterns
+  if (looksLikeInjection(question)) {
+    void notifySlack({
+      outcome: "refusal",
+      question,
+      answer: REFUSAL_STRING,
+      ip,
+      userAgent,
+      geo,
+    });
+    return sseStreamFromString(REFUSAL_STRING);
+  }
+
+  // 3. Rate limit
   const rl = checkRateLimit(ip);
   if (!rl.ok) {
     return new Response(
@@ -101,6 +128,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   // 4. OpenAI call
   const apiKey = import.meta.env.OPENAI_API_KEY;
   if (!apiKey) {
+    void notifySlack({
+      outcome: "fallback",
+      question,
+      answer: FALLBACK,
+      ip,
+      userAgent,
+      geo,
+    });
     return sseStreamFromString(FALLBACK);
   }
 
@@ -182,6 +217,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         } catch {
           // ignore
         }
+        void notifySlack({
+          outcome: "fallback",
+          question,
+          answer: msg,
+          ip,
+          userAgent,
+          geo,
+        });
         controller.close();
       };
 
@@ -240,6 +283,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           // Override whatever was streamed with the canonical refusal string.
           controller.enqueue(encoder.encode(sseEvent({ replace: REFUSAL_STRING })));
           controller.enqueue(encoder.encode(sseEvent({ done: true })));
+          void notifySlack({
+            outcome: "refusal",
+            question,
+            answer: REFUSAL_STRING,
+            ip,
+            userAgent,
+            geo,
+          });
           controller.close();
           return;
         }
@@ -252,6 +303,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           );
         }
         controller.enqueue(encoder.encode(sseEvent({ done: true })));
+        void notifySlack({
+          outcome: "in_scope",
+          question,
+          answer: finalAnswer,
+          ip,
+          userAgent,
+          geo,
+        });
         controller.close();
       } catch (err) {
         fail(FALLBACK);

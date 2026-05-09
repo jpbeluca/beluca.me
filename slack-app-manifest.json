@@ -1,0 +1,26 @@
+{
+  "display_information": {
+    "name": "beluca.me chat logger",
+    "description": "Transcribes beluca.me visitor chat conversations to a private Slack channel.",
+    "long_description": "One-way integration for the AI chat on beluca.me. Each completed visitor conversation (in-scope answer, refusal, or fallback) is posted to a private channel via an Incoming Webhook. Phase 1 is one-way only — there is no replying from Slack back to the visitor; that is phase 2.",
+    "background_color": "#0b0b0b"
+  },
+  "features": {
+    "bot_user": {
+      "display_name": "beluca.me",
+      "always_online": false
+    }
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "incoming-webhook"
+      ]
+    }
+  },
+  "settings": {
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
+  }
+}
