@@ -18,6 +18,7 @@ export type Project = {
   stack: string[];
   impact: string;
   details: string[];
+  image: string;
 };
 
 export type Skills = Record<string, string[]>;
@@ -117,6 +118,7 @@ export const profile = {
         "Implemented RAG pipeline with statistical embeddings in a vector DB for contextual business intelligence.",
         "Optimized token consumption with prompt engineering and caching strategies.",
       ],
+      image: "/images/work/ai-sales-agent.svg",
     },
     {
       id: "b2b-crm",
@@ -134,6 +136,7 @@ export const profile = {
         "ERP integration via REST APIs.",
         "Built on AWS with external integrations to Google APIs.",
       ],
+      image: "/images/work/b2b-crm.svg",
     },
     {
       id: "healthcare-tracking",
@@ -151,6 +154,7 @@ export const profile = {
         "APIs and analytics dashboards for operational visibility.",
         "Improved asset utilization and reduced inefficiencies.",
       ],
+      image: "/images/work/healthcare-tracking.svg",
     },
   ] satisfies Project[],
 

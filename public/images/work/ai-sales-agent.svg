@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="ag-bg" x1="0" y1="0" x2="0.6" y2="1">
+      <stop offset="0" stop-color="#1f2b1c"/>
+      <stop offset="0.55" stop-color="#2f4234"/>
+      <stop offset="1" stop-color="#0e1a14"/>
+    </linearGradient>
+    <radialGradient id="ag-glow" cx="0.3" cy="0.25" r="0.7">
+      <stop offset="0" stop-color="#a3c9a8" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#a3c9a8" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="ag-grid" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="#a3c9a8" fill-opacity="0.18"/>
+    </pattern>
+  </defs>
+  <rect width="800" height="1000" fill="url(#ag-bg)"/>
+  <rect width="800" height="1000" fill="url(#ag-grid)"/>
+  <rect width="800" height="1000" fill="url(#ag-glow)"/>
+  <g stroke="#c8d8c8" stroke-opacity="0.22" stroke-width="1" fill="none">
+    <path d="M -50 720 Q 200 640 400 700 T 850 660"/>
+    <path d="M -50 760 Q 220 700 420 760 T 850 720"/>
+    <path d="M -50 800 Q 240 760 440 820 T 850 780"/>
+  </g>
+  <g font-family="ui-monospace, 'Geist Mono', monospace" font-size="11" letter-spacing="2" fill="#c8d8c8" fill-opacity="0.45">
+    <text x="48" y="80">AGENT · TOOL-CALL · RAG</text>
+    <text x="48" y="100" fill-opacity="0.28">vector_db.query()</text>
+  </g>
+  <g transform="translate(560 200)" fill="none" stroke="#c8d8c8" stroke-opacity="0.55" stroke-width="1.2">
+    <circle r="80"/>
+    <circle r="50" stroke-opacity="0.3"/>
+    <circle r="20" stroke-opacity="0.18"/>
+    <circle r="3" fill="#c8d8c8" fill-opacity="0.7" stroke="none"/>
+    <line x1="-110" y1="0" x2="-85" y2="0" stroke-opacity="0.4"/>
+    <line x1="85" y1="0" x2="110" y2="0" stroke-opacity="0.4"/>
+    <line x1="0" y1="-110" x2="0" y2="-85" stroke-opacity="0.4"/>
+    <line x1="0" y1="85" x2="0" y2="110" stroke-opacity="0.4"/>
+  </g>
+</svg>
