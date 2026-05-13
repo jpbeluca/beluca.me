@@ -1,46 +1,53 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1000" preserveAspectRatio="xMidYMid slice">
   <defs>
-    <linearGradient id="hc-bg" x1="0" y1="0" x2="0.4" y2="1">
-      <stop offset="0" stop-color="#142a2d"/>
-      <stop offset="0.55" stop-color="#0d1f25"/>
-      <stop offset="1" stop-color="#06121a"/>
+    <linearGradient id="hc-bg" x1="0.2" y1="0" x2="0.8" y2="1">
+      <stop offset="0" stop-color="#fafaf3"/>
+      <stop offset="0.5" stop-color="#e2eced"/>
+      <stop offset="1" stop-color="#c7d8dc"/>
     </linearGradient>
-    <radialGradient id="hc-glow" cx="0.25" cy="0.75" r="0.7">
-      <stop offset="0" stop-color="#8fc7c8" stop-opacity="0.18"/>
-      <stop offset="1" stop-color="#8fc7c8" stop-opacity="0"/>
+    <radialGradient id="hc-glow" cx="0.75" cy="0.2" r="0.65">
+      <stop offset="0" stop-color="#2c4e52" stop-opacity="0.14"/>
+      <stop offset="1" stop-color="#2c4e52" stop-opacity="0"/>
     </radialGradient>
   </defs>
   <rect width="800" height="1000" fill="url(#hc-bg)"/>
   <rect width="800" height="1000" fill="url(#hc-glow)"/>
 
-  <!-- horizontal grid lines -->
-  <g stroke="#7fb5b8" stroke-opacity="0.12" stroke-width="1">
-    <line x1="0" y1="200" x2="800" y2="200"/>
-    <line x1="0" y1="320" x2="800" y2="320"/>
-    <line x1="0" y1="440" x2="800" y2="440"/>
-    <line x1="0" y1="560" x2="800" y2="560"/>
-    <line x1="0" y1="680" x2="800" y2="680"/>
-    <line x1="0" y1="800" x2="800" y2="800"/>
+  <!-- horizontal grid lines (subtle) -->
+  <g stroke="#2c4e52" stroke-opacity="0.14" stroke-width="1">
+    <line x1="0" y1="220" x2="800" y2="220"/>
+    <line x1="0" y1="340" x2="800" y2="340"/>
+    <line x1="0" y1="460" x2="800" y2="460"/>
+    <line x1="0" y1="580" x2="800" y2="580"/>
+    <line x1="0" y1="700" x2="800" y2="700"/>
   </g>
 
-  <!-- pulse waveform -->
-  <g fill="none" stroke="#b5dadc" stroke-width="1.4" stroke-opacity="0.7" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M -20 500 L 120 500 L 160 500 L 180 460 L 210 540 L 240 380 L 270 620 L 300 480 L 340 500 L 460 500 L 490 460 L 520 540 L 550 380 L 580 620 L 610 480 L 650 500 L 820 500"/>
-  </g>
-  <g fill="none" stroke="#b5dadc" stroke-width="1" stroke-opacity="0.25">
+  <!-- pulse waveform — strong, two passes for depth -->
+  <g fill="none" stroke="#2c4e52" stroke-opacity="0.18" stroke-width="1.2">
     <path d="M -20 500 L 820 500"/>
   </g>
-
-  <!-- RFID ripple circles -->
-  <g fill="none" stroke="#b5dadc" stroke-opacity="0.45">
-    <circle cx="640" cy="240" r="14" stroke-opacity="0.7"/>
-    <circle cx="640" cy="240" r="34" stroke-opacity="0.4"/>
-    <circle cx="640" cy="240" r="58" stroke-opacity="0.22"/>
-    <circle cx="640" cy="240" r="88" stroke-opacity="0.12"/>
+  <g fill="none" stroke="#2c4e52" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M -20 500 L 120 500 L 160 500 L 180 450 L 210 555 L 240 360 L 270 640 L 300 470 L 340 500 L 460 500 L 490 450 L 520 555 L 550 360 L 580 640 L 610 470 L 650 500 L 820 500"/>
   </g>
 
-  <g font-family="ui-monospace, 'Geist Mono', monospace" font-size="11" letter-spacing="2" fill="#7fb5b8" fill-opacity="0.5">
-    <text x="48" y="80">RFID · IoT · EVENT-DRIVEN</text>
-    <text x="48" y="100" fill-opacity="0.3">ingest.stream() →</text>
+  <!-- RFID ripple circles (strong center) -->
+  <g fill="none" stroke="#2c4e52">
+    <circle cx="620" cy="240" r="14" stroke-width="2" stroke-opacity="0.95"/>
+    <circle cx="620" cy="240" r="34" stroke-width="1.4" stroke-opacity="0.55"/>
+    <circle cx="620" cy="240" r="58" stroke-width="1.2" stroke-opacity="0.3"/>
+    <circle cx="620" cy="240" r="88" stroke-width="1" stroke-opacity="0.15"/>
+    <circle cx="620" cy="240" r="5" fill="#2c4e52" stroke="none"/>
+  </g>
+
+  <!-- mono labels top -->
+  <g font-family="ui-monospace, 'Geist Mono', monospace" font-size="11" letter-spacing="2" fill="#0e1f3a" fill-opacity="0.55">
+    <text x="48" y="86">RFID · IoT · EVENT-DRIVEN</text>
+    <text x="48" y="106" fill-opacity="0.3">ingest.stream() →</text>
+  </g>
+
+  <!-- accent corner mark -->
+  <g transform="translate(48 870)" fill="none" stroke="#2c4e52" stroke-width="1.2" stroke-opacity="0.5">
+    <rect width="14" height="14"/>
+    <line x1="0" y1="22" x2="60" y2="22"/>
   </g>
 </svg>

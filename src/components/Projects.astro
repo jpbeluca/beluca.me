@@ -112,13 +112,13 @@ import { profile } from "../data/profile";
     inset: 0;
     background: linear-gradient(
       to top,
-      rgba(8, 14, 24, 0.92) 0%,
-      rgba(8, 14, 24, 0.78) 22%,
-      rgba(8, 14, 24, 0.28) 55%,
-      rgba(8, 14, 24, 0.05) 78%,
-      rgba(8, 14, 24, 0.18) 100%
+      rgba(8, 14, 24, 0.94) 0%,
+      rgba(8, 14, 24, 0.82) 22%,
+      rgba(8, 14, 24, 0.32) 52%,
+      rgba(8, 14, 24, 0) 75%,
+      rgba(8, 14, 24, 0) 100%
     );
-    transition: opacity 0.4s ease;
+    transition: background 0.45s ease;
   }
 
   .project-card:hover .project-card__scrim {
@@ -126,8 +126,8 @@ import { profile } from "../data/profile";
       to top,
       rgba(6, 11, 20, 0.96) 0%,
       rgba(6, 11, 20, 0.88) 35%,
-      rgba(6, 11, 20, 0.65) 65%,
-      rgba(6, 11, 20, 0.45) 100%
+      rgba(6, 11, 20, 0.62) 70%,
+      rgba(6, 11, 20, 0.4) 100%
     );
   }
 
@@ -138,7 +138,7 @@ import { profile } from "../data/profile";
     background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
     background-size: 160px 160px;
     mix-blend-mode: overlay;
-    opacity: 0.55;
+    opacity: 0.32;
     pointer-events: none;
   }
 
@@ -151,7 +151,8 @@ import { profile } from "../data/profile";
     font-size: 10px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: rgba(243, 239, 226, 0.7);
+    color: rgba(14, 31, 58, 0.75);
+    transition: color 0.35s ease;
   }
 
   .project-card__corner--tl {
@@ -168,11 +169,19 @@ import { profile } from "../data/profile";
     left: 0;
     width: 12px;
     height: 1px;
-    background: rgba(243, 239, 226, 0.45);
+    background: rgba(14, 31, 58, 0.5);
+    transition: background 0.35s ease;
   }
   .project-card__corner--tr::before {
     left: auto;
     right: 0;
+  }
+
+  .project-card:hover .project-card__corner {
+    color: rgba(243, 239, 226, 0.85);
+  }
+  .project-card:hover .project-card__corner::before {
+    background: rgba(243, 239, 226, 0.5);
   }
 
   /* ---------- Base content (always visible) ---------- */
@@ -324,8 +333,15 @@ import { profile } from "../data/profile";
         rgba(6, 11, 20, 0.96) 0%,
         rgba(6, 11, 20, 0.88) 45%,
         rgba(6, 11, 20, 0.55) 75%,
-        rgba(6, 11, 20, 0.25) 100%
+        rgba(6, 11, 20, 0.3) 100%
       );
+    }
+
+    .project-card__corner {
+      color: rgba(243, 239, 226, 0.85);
+    }
+    .project-card__corner::before {
+      background: rgba(243, 239, 226, 0.5);
     }
 
     .project-card__image {
