@@ -19,6 +19,7 @@ export type Project = {
   impact: string;
   details: string[];
   image: string;
+  link?: string;
 };
 
 export type Skills = Record<string, string[]>;
@@ -96,35 +97,71 @@ export const profile = {
 
   projects: [
     {
-      id: "ai-sales-agent",
-      title: "AI-Powered Sales Intelligence Agent",
-      industry: "Agribusiness",
-      year: "2024",
-      role: "Solutions Architect & Tech Lead",
+      id: "full-engage",
+      title: "Full Engage — Operating System for Multi-Client Consultants",
+      industry: "B2B SaaS / Consulting Operations",
+      year: "2026",
+      role: "Founder & Lead Engineer",
       summary:
-        "An agentic conversational layer embedded into a CRM. Sales directors ask questions in natural language; the agent runs SQL via tool-calling and enriches answers with RAG over historical data.",
+         "A multi-tenant SaaS that gives fractional executives and advisory firms one operational backbone for every client engagement — tasks, meetings, notes, time tracking, and an AI co-pilot, all isolated per client workspace.",
       stack: [
+        "Next.js 16",
+        "React 19",                
+        "Neo Database + Prisma",
         "OpenAI",
-        "Tool-calling",
-        "Vector DB",
-        "RAG",
-        "Stored Procedures",
-        "Prompt Caching",
+        "Stripe",
+        "AI SDK + OpenAI",
+        "RAG + Vector Embeddings",        
       ],
       impact:
-        "Became a daily tool for the commercial team — accelerated deal prep, cut prep time before client visits.",
+        "Replaces the consultant's daily stack — CRM, planner, time tracking, and knowledge base — with one workspace, killing the context-switching between Notion, Asana, and Google Calendar across multiple clients.",
       details: [
-        "Designed agentic architecture with OpenAI's tool-calling against client's database via stored procedures.",
-        "Implemented RAG pipeline with statistical embeddings in a vector DB for contextual business intelligence.",
-        "Optimized token consumption with prompt engineering and caching strategies.",
+        "Designed a strict multi-tenant architecture: every query is filtered by organizationId, with platform-admin and org-role (owner / admin / member) layered on top, plus a privacy model that hides assigned tasks from non-assignees and renders read-only summaries for time-blocking events.",
+        "Built a dual API surface — tRPC v11 for the in-app client and a versioned REST API (app/api/v1/) wrapped in withApiKeyAuth — so external integrations (Google Calendar, Microsoft 365, Slack, QuickBooks, Zapier) hit the same business logic as the product UI.",
+        "Implemented an AI co-pilot with a RAG pipeline: notes and uploaded files are parsed, chunked, embedded, and stored as vectors, then surfaced to a tool-calling agent that can search, summarize activity, draft agendas, and reference org context inside a chat scoped to the active client.",
+        "Shipped a unified Planner with cross-view drag-and-drop (calendar reschedule, kanban status changes), 15-minute snap, optimistic mutations with automatic rollback, bulk operations up to 100 items, and ghost rendering for items from non-active clients so consultants can spot scheduling conflicts without losing focus.",
+        "Built an organization-wide Audit Log: every create / update / delete across tRPC and REST emits a fire-and-forget audit entry with actor, IP, user-agent, and auth method (session vs API key), giving compliance-conscious clients a complete trail.",
+        "Established a testing discipline that's mandatory for every new feature: Vitest unit + DB-integration tests with factories under tests/support/factories, with explicit coverage for multi-tenant isolation (data from org A must never leak to org B).",
       ],
-      image: "/images/work/ai-sales-agent.svg",
+      image: "/images/work/full-engage.svg",
+      link: "https://fullengage.ai",
     },
+    {
+      id: "gipo-saas-platform",
+      title: "Gipo — SaaS Project & Productivity Management Platform",
+      industry: "SaaS / Project Management",
+      year: "2022-Present",
+      role: "Founder & Solutions Architect",
+      summary:
+        "Cloud-native SaaS platform focused on project management, time tracking, productivity analytics, and operational cost control for modern teams.",
+      stack: [
+        "AWS",
+        "PHP",        
+        "MySQL",
+        "WebSocket",
+        "Stripe",
+        "Docker",
+        "REST API",
+      ],
+      impact:
+        "Built a scalable subscription-based SaaS platform enabling companies to improve workflow visibility, optimize team productivity, and control operational costs in real time.",
+      details: [
+        "Designed and implemented scalable SaaS architecture hosted on AWS.",
+        "Developed real-time task and time tracking capabilities using WebSocket technologies.",
+        "Integrated Stripe subscription billing for automated recurring revenue operations.",
+        "Created analytics and productivity monitoring features for operational visibility.",
+        "Built APIs and integrations supporting extensibility and automation.",
+        "Structured the platform for scalability, multi-team collaboration, and continuous delivery.",
+      ],
+      image: "/images/work/gipo.svg",
+      link: "https://gipo.io",
+    },
+    
     {
       id: "b2b-crm",
       title: "B2B Commercial Operations & CRM Platform",
       industry: "Manufacturing & Distribution",
-      year: "2020-2024",
+      year: "2017-Present",
       role: "Solutions Architect",
       summary:
         "Custom CRM for a 300+ person manufacturing group with hundreds of millions in annual revenue. Centralizes commercial operations end-to-end.",
@@ -137,24 +174,6 @@ export const profile = {
         "Built on AWS with external integrations to Google APIs.",
       ],
       image: "/images/work/b2b-crm.svg",
-    },
-    {
-      id: "healthcare-tracking",
-      title: "Healthcare Operations & Asset Tracking Platform",
-      industry: "Healthcare",
-      year: "2019-2022",
-      role: "Solutions Architect",
-      summary:
-        "Cloud platform for hospital operations — real-time tracking of medical assets and patient flow via RFID/IoT.",
-      stack: ["Event-Driven", "RFID/IoT", "AWS", "Analytics Dashboards"],
-      impact:
-        "Mission-critical system supporting daily hospital workflows. Improved asset utilization, reduced operational waste.",
-      details: [
-        "Scalable, event-driven architecture for RFID/IoT data ingestion.",
-        "APIs and analytics dashboards for operational visibility.",
-        "Improved asset utilization and reduced inefficiencies.",
-      ],
-      image: "/images/work/healthcare-tracking.svg",
     },
   ] satisfies Project[],
 
