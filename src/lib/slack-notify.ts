@@ -47,7 +47,8 @@ function buildText(event: SlackChatEvent): string {
 
 export async function notifySlack(event: SlackChatEvent): Promise<void> {
   try {
-    const url = import.meta.env.SLACK_WEBHOOK_URL as string | undefined;
+    const url = (process.env.SLACK_WEBHOOK_URL ??
+      import.meta.env.SLACK_WEBHOOK_URL) as string | undefined;
     if (!url) {
       console.warn("[slack-notify] SLACK_WEBHOOK_URL not set; skipping");
       return;

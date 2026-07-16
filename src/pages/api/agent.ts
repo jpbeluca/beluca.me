@@ -1,12 +1,20 @@
 import type { APIRoute } from "astro";
 import OpenAI from "openai";
-import { waitUntil } from "@vercel/functions";
 import { profile } from "../../data/profile";
 import { buildSystemPrompt, REFUSAL_STRING } from "../../lib/agent-prompt";
 import { checkRateLimit } from "../../lib/rate-limit";
 import { notifySlack } from "../../lib/slack-notify";
 
 export const prerender = false;
+
+// On the standalone Node server the process stays alive after the response is
+// sent, so background work (Slack transcription) just needs to run detached
+// without blocking or throwing. notifySlack already swallows its own errors,
+// so discarding the promise is safe. (On Vercel this was @vercel/functions'
+// waitUntil, which kept the serverless invocation alive; unneeded here.)
+function waitUntil(promise: Promise<unknown>): void {
+  void promise;
+}
 
 type Body = { question?: unknown };
 
@@ -129,7 +137,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   // 4. OpenAI call
-  const apiKey = import.meta.env.OPENAI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY ?? import.meta.env.OPENAI_API_KEY;
   if (!apiKey) {
     waitUntil(
       notifySlack({
