@@ -45,10 +45,14 @@ function buildText(event: SlackChatEvent): string {
   return `${header}\n${q}\n${a}`;
 }
 
-export async function notifySlack(event: SlackChatEvent): Promise<void> {
+// The webhook URL is passed in rather than read here: on Workers it lives on
+// the request-scoped `locals.runtime.env`, and neither `process.env` nor
+// `import.meta.env` (frozen at build time) can reach it from module scope.
+export async function notifySlack(
+  event: SlackChatEvent,
+  url: string | undefined,
+): Promise<void> {
   try {
-    const url = (process.env.SLACK_WEBHOOK_URL ??
-      import.meta.env.SLACK_WEBHOOK_URL) as string | undefined;
     if (!url) {
       console.warn("[slack-notify] SLACK_WEBHOOK_URL not set; skipping");
       return;

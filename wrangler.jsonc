@@ -1,0 +1,20 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "beluca-me",
+  "main": "./dist/_worker.js/index.js",
+  "compatibility_date": "2026-08-11",
+  // nodejs_compat: the OpenAI SDK pulls in Node built-ins.
+  // global_fetch_strictly_public: keeps outbound fetch on the public internet
+  // instead of looping back into the zone once beluca.me points here.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": "./dist",
+    "binding": "ASSETS"
+  },
+  "observability": {
+    "enabled": true
+  }
+  // Secrets (OPENAI_API_KEY, SLACK_WEBHOOK_URL) are intentionally NOT declared
+  // here — they are set with `wrangler secret put` and survive every deploy.
+  // Plain-text "vars" added in the dashboard are wiped on the next deploy.
+}

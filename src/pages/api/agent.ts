@@ -3,18 +3,9 @@ import OpenAI from "openai";
 import { profile } from "../../data/profile";
 import { buildSystemPrompt, REFUSAL_STRING } from "../../lib/agent-prompt";
 import { checkRateLimit } from "../../lib/rate-limit";
-import { notifySlack } from "../../lib/slack-notify";
+import { notifySlack, type SlackChatEvent } from "../../lib/slack-notify";
 
 export const prerender = false;
-
-// On the standalone Node server the process stays alive after the response is
-// sent, so background work (Slack transcription) just needs to run detached
-// without blocking or throwing. notifySlack already swallows its own errors,
-// so discarding the promise is safe. (On Vercel this was @vercel/functions'
-// waitUntil, which kept the serverless invocation alive; unneeded here.)
-function waitUntil(promise: Promise<unknown>): void {
-  void promise;
-}
 
 type Body = { question?: unknown };
 
@@ -64,7 +55,7 @@ function sseStreamFromString(text: string): Response {
   return new Response(stream, { status: 200, headers: sseHeaders() });
 }
 
-export const POST: APIRoute = async ({ request, clientAddress }) => {
+export const POST: APIRoute = async ({ request, clientAddress, locals }) => {
   // 1. Validate body
   let body: Body = {};
   try {
@@ -90,34 +81,42 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     ip = "unknown";
   }
   const userAgent = request.headers.get("user-agent") ?? "";
-  // Vercel URL-encodes city headers; malformed values (rare but possible
-  // from spoofed headers or upstream proxies) make decodeURIComponent throw.
-  const safeDecode = (s: string | null): string | undefined => {
-    if (!s) return undefined;
-    try {
-      return decodeURIComponent(s);
-    } catch {
-      return s;
-    }
-  };
+  // Cloudflare carries visitor geo on request.cf — the x-vercel-ip-* headers
+  // this used to read do not exist here, which is why every transcript since
+  // the migration logged "no-geo". cf is absent under `astro dev` without the
+  // platform proxy, so fall back to the header the edge always sets.
+  const cf = locals.runtime?.cf;
   const geo = {
-    country: request.headers.get("x-vercel-ip-country") ?? undefined,
-    region: request.headers.get("x-vercel-ip-country-region") ?? undefined,
-    city: safeDecode(request.headers.get("x-vercel-ip-city")),
+    country: cf?.country ?? request.headers.get("cf-ipcountry") ?? undefined,
+    region: cf?.region ?? undefined,
+    city: cf?.city ?? undefined,
+  };
+
+  const env = locals.runtime?.env;
+  const ctx = locals.runtime?.ctx;
+  const webhookUrl = env?.SLACK_WEBHOOK_URL ?? import.meta.env.SLACK_WEBHOOK_URL;
+
+  // A Worker's isolate is torn down as soon as the response stream closes, so a
+  // detached promise gets cancelled mid-flight — the Slack POST never lands and
+  // not even its catch runs. (The persistent Node process on Railway kept it
+  // alive on its own, which is why a bare `void promise` was enough there.)
+  // ctx.waitUntil extends the invocation until the POST settles.
+  const logToSlack = (event: SlackChatEvent): void => {
+    const pending = notifySlack(event, webhookUrl);
+    if (ctx) ctx.waitUntil(pending);
+    else void pending;
   };
 
   // 2. Anti-injection pre-filter — short-circuit obvious patterns
   if (looksLikeInjection(question)) {
-    waitUntil(
-      notifySlack({
-        outcome: "refusal",
-        question,
-        answer: REFUSAL_STRING,
-        ip,
-        userAgent,
-        geo,
-      }),
-    );
+    logToSlack({
+      outcome: "refusal",
+      question,
+      answer: REFUSAL_STRING,
+      ip,
+      userAgent,
+      geo,
+    });
     return sseStreamFromString(REFUSAL_STRING);
   }
 
@@ -137,18 +136,16 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   // 4. OpenAI call
-  const apiKey = process.env.OPENAI_API_KEY ?? import.meta.env.OPENAI_API_KEY;
+  const apiKey = env?.OPENAI_API_KEY ?? import.meta.env.OPENAI_API_KEY;
   if (!apiKey) {
-    waitUntil(
-      notifySlack({
-        outcome: "fallback",
-        question,
-        answer: FALLBACK,
-        ip,
-        userAgent,
-        geo,
-      }),
-    );
+    logToSlack({
+      outcome: "fallback",
+      question,
+      answer: FALLBACK,
+      ip,
+      userAgent,
+      geo,
+    });
     return sseStreamFromString(FALLBACK);
   }
 
@@ -230,16 +227,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
         } catch {
           // ignore
         }
-        waitUntil(
-          notifySlack({
-            outcome: "fallback",
-            question,
-            answer: msg,
-            ip,
-            userAgent,
-            geo,
-          }),
-        );
+        logToSlack({
+          outcome: "fallback",
+          question,
+          answer: msg,
+          ip,
+          userAgent,
+          geo,
+        });
         controller.close();
       };
 
@@ -298,16 +293,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           // Override whatever was streamed with the canonical refusal string.
           controller.enqueue(encoder.encode(sseEvent({ replace: REFUSAL_STRING })));
           controller.enqueue(encoder.encode(sseEvent({ done: true })));
-          waitUntil(
-            notifySlack({
-              outcome: "refusal",
-              question,
-              answer: REFUSAL_STRING,
-              ip,
-              userAgent,
-              geo,
-            }),
-          );
+          logToSlack({
+            outcome: "refusal",
+            question,
+            answer: REFUSAL_STRING,
+            ip,
+            userAgent,
+            geo,
+          });
           controller.close();
           return;
         }
@@ -320,16 +313,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
           );
         }
         controller.enqueue(encoder.encode(sseEvent({ done: true })));
-        waitUntil(
-          notifySlack({
-            outcome: "in_scope",
-            question,
-            answer: finalAnswer,
-            ip,
-            userAgent,
-            geo,
-          }),
-        );
+        logToSlack({
+          outcome: "in_scope",
+          question,
+          answer: finalAnswer,
+          ip,
+          userAgent,
+          geo,
+        });
         controller.close();
       } catch (err) {
         fail(FALLBACK);

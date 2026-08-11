@@ -12,7 +12,7 @@ The site is a single-page experience (hero, background, writing, projects, capab
 - **TypeScript** — strict, project-wide.
 - **[Satori](https://github.com/vercel/satori)** + **[@resvg/resvg-js](https://github.com/yisibl/resvg-js)** — dynamic Open Graph image generation at `/og.png` (`src/pages/og.png.ts`, `src/lib/og.tsx`).
 - **[@astrojs/sitemap](https://docs.astro.build/en/guides/integrations-guide/sitemap/)** — auto-generated sitemap.
-- **[@astrojs/node](https://docs.astro.build/en/guides/integrations-guide/node/)** — standalone Node adapter for the on-demand agent endpoint.
+- **[@astrojs/cloudflare](https://docs.astro.build/en/guides/integrations-guide/cloudflare/)** — Workers adapter for the on-demand agent endpoint.
 - **Geist** + **Geist Mono** (Google Fonts) — typography.
 
 ## Project layout
@@ -45,11 +45,23 @@ All bio, experience, projects, and skills data lives in `src/data/profile.ts` �
 npm install
 npm run dev       # astro dev — http://localhost:4321
 npm run build     # production build to ./dist (static + SSR entry)
-npm run preview   # serve the built site locally
+npm run preview   # build, then serve on the real Workers runtime via wrangler dev
+npm run deploy    # build + wrangler deploy
 ```
 
-Node 20+ recommended (Astro 5 / `@astrojs/node` 9 baseline).
+Node 20+ recommended (Astro 5 baseline).
 
 ## Deployment
 
-The build produces a hybrid output: prerendered HTML for the portfolio and writing, plus a Node entry that serves `/api/agent`. Any Node-compatible host works — set the start command to run the standalone server emitted under `dist/server/`.
+Cloudflare Workers (`beluca-me`), configured in `wrangler.jsonc`. The build produces a hybrid output: prerendered HTML served by Workers Static Assets, plus `dist/_worker.js` handling `/api/agent` on demand.
+
+Deploy with `npm run deploy`.
+
+Secrets are **not** in `wrangler.jsonc` — set them once per Worker and they survive every deploy:
+
+```bash
+npx wrangler secret put OPENAI_API_KEY
+npx wrangler secret put SLACK_WEBHOOK_URL
+```
+
+Avoid adding them as plain-text *Variables* in the dashboard: `wrangler deploy` replaces the Worker's vars with whatever the config declares, so dashboard-added ones disappear on the next deploy. At runtime both are read from `locals.runtime.env` (`import.meta.env` is frozen at build time and cannot see them).
